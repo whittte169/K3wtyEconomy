@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "endstone-k3wty-economy"
-version = "1.0.0"
+version = "1.0.1"
 description = "Lightweight and powerful economy system for your Minecraft server. This plugin provides a stable, seamless virtual currency system without any server lag."
 dependencies = [
     "endstone>=0.11.0",
