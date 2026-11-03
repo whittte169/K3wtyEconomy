@@ -4,11 +4,11 @@ Lightweight and fast economy system for [Endstone](https://github.com/EndstoneMC
 
 K3wtyEconomy is a standalone plugin that stores player balances in a local SQLite database and exposes a small **Python API** and an **event system** so other plugins can read and modify balances, send money between players, manage **multiple currencies (vaults)** and react to economy activity.
 
-![Version](https://img.shields.io/badge/version-1.0.1-brightgreen)
+![Version](https://img.shields.io/badge/version-1.0.2-brightgreen)
 ![Endstone](https://img.shields.io/badge/endstone-%3E%3D0.11.0-blue)
 ![Storage](https://img.shields.io/badge/storage-SQLite-lightgrey)
 
-> **Package:** `endstone-k3wty-economy` · **Version:** `1.0.1` · **Requires:** `endstone >= 0.11.0` · **Plugin name:** `k3wty_economy`
+> **Package:** `endstone-k3wty-economy` · **Version:** `1.0.2` · **Requires:** `endstone >= 0.11.0` · **Plugin name:** `k3wty_economy`
 >
 > **GitHub:** <https://github.com/whittte169/K3wtyEconomy>
 
@@ -17,6 +17,7 @@ K3wtyEconomy is a standalone plugin that stores player balances in a local SQLit
 ## Table of contents
 
 - [What's new in 1.0.1](#whats-new-in-101)
+- [What's new in 1.0.2](#whats-new-in-102)
 - [Features](#features)
 - [Installation](#installation)
   - [For server owners](#for-server-owners)
@@ -81,6 +82,27 @@ Drop-in replacement. The database format is unchanged, so no migration is needed
 
 ---
 
+## What's new in 1.0.2
+
+### New
+
+- **Vault support in `/balance`.** `/balance [vault]` now shows your balance in any vault, not just `main`.
+- **Vault support in `/pay`.** `/pay <player> <amount> [vault]` now sends money in any vault, so players can pay each other in coins, gems, tokens, etc.
+- **Vault-aware messages.** Chat feedback from `/balance`, `/pay` and `/eco` now shows the vault name in parentheses when it is not `main`, for example `Your balance: $1,000.00 (gems)`.
+
+### Notes
+
+- The vault name is optional everywhere. When it is omitted, `main` is used, so existing commands and habits keep working unchanged.
+- Vault names typed into commands are case-insensitive.
+- `/vault create` accepts names made of letters and digits, up to 16 characters.
+- No changes to the Python API, the events or the database.
+
+### Upgrading from 1.0.1
+
+Drop-in replacement. The API, the events and the database format are unchanged, so no migration is needed. Just replace the `.whl` file in `plugins/` and restart the server.
+
+---
+
 ## Features
 
 - Simple name-based balance storage in SQLite (WAL mode, no external services required).
@@ -130,7 +152,7 @@ git clone https://github.com/whittte169/K3wtyEconomy.git
 cd K3wtyEconomy
 pip install build
 python -m build --wheel
-pip install dist/endstone_k3wty_economy-1.0.1-py3-none-any.whl
+pip install dist/endstone_k3wty_economy-1.0.2-py3-none-any.whl
 ```
 
 If you want to declare it in your own `pyproject.toml`, use a direct reference:
@@ -560,16 +582,20 @@ These are provided by K3wtyEconomy itself.
 
 | Command | Aliases | Description | Permission | Default |
 |---|---|---|---|---|
-| `/balance` | `bal`, `money`, `mybal`, `mybalance`, `mymoney` | Show your own balance. | `white.endstone.k3wtyeconomy.commands.balance` | everyone |
-| `/pay <player> <amount>` | none | Send money to another online player (minimum `0.01`). | `white.endstone.k3wtyeconomy.commands.pay` | everyone |
+| `/balance [vault]` | `bal`, `money`, `mybal`, `mybalance`, `mymoney` | Show your own balance in the given vault (default `main`). | `white.endstone.k3wtyeconomy.commands.balance` | everyone |
+| `/pay <player> <amount> [vault]` | none | Send money to another online player in the given vault (default `main`, minimum `0.01`). | `white.endstone.k3wtyeconomy.commands.pay` | everyone |
 | `/eco get <player> [vault]` | `/economy` | Show a player's balance. | `white.endstone.k3wtyeconomy.commands.eco` | operators |
 | `/eco <set\|add\|withdraw> <player> <value> [vault]` | `/economy` | Administrative balance management. `withdraw` takes at most what the player has. Use `/eco help` for usage. | `white.endstone.k3wtyeconomy.commands.eco` | operators |
-| `/vault create <name>` | none | Create a new vault (currency). | `white.endstone.k3wtyeconomy.commands.vault` | operators |
+| `/vault create <name>` | none | Create a new vault (currency). Name: letters and digits, up to 16 characters. | `white.endstone.k3wtyeconomy.commands.vault` | operators |
 | `/vault delete <name>` | none | Delete a vault together with all balances in it. The `main` vault cannot be deleted. | `white.endstone.k3wtyeconomy.commands.vault` | operators |
 
 When the `[vault]` argument is omitted, `main` is used.
 
 ```text
+/balance
+/balance gems
+/pay Alex 50
+/pay Alex 5 gems
 /eco get Steve
 /eco add Steve 250 gems
 /vault create gems
